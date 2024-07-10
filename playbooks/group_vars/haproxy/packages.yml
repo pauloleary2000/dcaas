@@ -1,0 +1,6 @@
+---
+haproxy_enable_repos: epel
+
+haproxy_packages:
+        - haproxy
+        - haveged

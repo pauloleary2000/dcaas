@@ -1,0 +1,46 @@
+---
+
+- name: Deploy haproxy servers
+  hosts: haproxy
+  vars:
+        site: olearys
+
+  tasks:
+        - name: Make sure the EPEL repo is installed
+          command: "yum -y install {{ global_epel_repo }}"
+
+        - name: Install the required Packages for {{ haproxy_service }}
+          yum:
+                name: "{{ haproxy_packages }}"
+                state: latest
+        
+        - name: Allow HAPROXY to start under SELinux
+          seboolean:
+                name: haproxy_connect_any
+                state: true
+                persistent: true
+
+        - name: Configure the {{ haproxy_service }} service
+          template:
+                dest: "{{ haproxy_config_file }}"
+                src: templates/haproxy/{{ haproxy_service }}_conf.j2
+                owner: root
+                group: root
+                mode: 0644
+          notify: restart haproxy
+        
+        - name: Start and Enable the {{ haproxy_service }} service
+          service:
+                name: "{{ haproxy_service }}"
+                enabled: true
+                state: started
+
+
+  handlers:
+
+        - name: restart haproxy
+          service:
+                name: "{{ haproxy_service }}"
+                state: restarted
+
+                        

@@ -1,0 +1,9 @@
+---
+
+mounts:
+        - name: kafka
+          path: /var/lib/kafka
+          fstype: nfs
+          src: "{{ kafka_nfs_server }}:/{{ kafka_volume }}"
+
+

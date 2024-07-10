@@ -1,0 +1,6 @@
+---
+
+dns_service: named
+dns_config_file: /etc/named.conf
+
+dns_zone_dir: /var/named/data/

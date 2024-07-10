@@ -1,0 +1,38 @@
+---
+# firewall ports to open
+
+firewall_ports:
+  - name: http
+    port: 80/tcp
+  - name: https
+    port: 443/tcp
+  - name: qrouterd
+    port: 5646/tcp
+  - name: qrouterd2
+    port: 5647/tcp
+  - name: https2
+    port: 9090/tcp
+  - name: anaconda
+    port: 8000/tcp
+  - name: puppet-agent
+    port: 8140/tcp
+  - name: openscap
+    port: 9090/tcp
+  - name: dns
+    port: 53/tcp
+  - name: dnsudp
+    port: 53/udp
+  - name: dhcp
+    port: 67/udp
+  - name: tftp
+    port: 69/udp
+  - name: ldap
+    port: 389/tcp
+  - name: ldaps
+    port: 636/tcp
+  - name: novnc
+    port: 5900-5930/tcp
+
+
+firewall_pkg: firewalld
+firewall_service: firewalld

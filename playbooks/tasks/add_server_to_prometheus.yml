@@ -1,0 +1,13 @@
+---
+
+# create a task that registers a new host with the prometheus server test
+vars:
+  prm_host: mt2cprm1.kxsrd.io
+
+- name: Add {{ inventory_hostname }} to Prometheus server
+  lineinefile:
+        #path: /etc/prometheus/targets/node.yml
+        path: /tmp/node.yml
+        insertafter: '# Add new node below'
+          line: "{targets: ['{{ ansible_default_ipv4.address }}:9100'], labels: {hostname: {{ ansible_hostname }} }},"
+  delegate_to: "{{ prm_host }}"

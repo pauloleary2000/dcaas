@@ -1,0 +1,17 @@
+---
+vmware_vcenter_server: "sl01c1vvc0001v.kxslab.io"
+vmware_vcenter_validate_certs: no
+inventory_name: "sl01c1tst9998v.kxslab.io"
+name: "sl01c1tst9998v"
+datacenter: "SL01C1"
+vmware_template: "sl01c1tmp0001v"
+vm_ip: "10.20.16.76"
+vm_netmask: "255.255.255.0"
+vm_gateway: "10.20.16.1"
+domain: "kxslab.io"
+vm_network_name: "sl01-c1-316"
+dns_server: "10.20.16.11"
+activation_key: "SL01"
+katello_organization: "KXSLAB"
+foreman_hostname: "sl01c1frm0002v.kxslab.io"
+os: "CentOS"

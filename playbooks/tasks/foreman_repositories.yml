@@ -1,0 +1,38 @@
+---
+
+# create the activation keys for the foreman server
+
+- name: Ensure Repositories are present and available
+  theforeman.foreman.repository:
+    username: "{{ foreman_admin_username }}"
+    password: "{{ foreman_admin_password }}"
+    server_url: "{{ foreman_server_url }}"
+    name: "{{ item.name }}"
+    organization: "{{ item.organization }}"
+    content_type: "{{ item.content_type }}"
+    url: "{{ item.url }}"
+    mirror_on_sync: "{{ item.mirror_on_sync }}"
+    download_policy: "{{ item.download_policy }}"
+    checksum_type: "{{ item.checksum_type }}"
+    auto_enabled: "{{ item.auto_enabled }}"
+    gpg_key: "{{ item.gpg_key }}"
+    product: "{{ item.product }}"
+    unprotected: "{{ item.unprotected }}"
+    validate_certs: false
+    verify_ssl_on_sync: "{{ item.verify_ssl_on_sync }}"
+  loop: "{{ repos }}"
+  ignore_errors: true
+
+- name: Synchronize Repositories
+  theforeman.foreman.repository_sync:
+    username: "{{ foreman_admin_username }}"
+    password: "{{ foreman_admin_password }}"
+    server_url: "{{ foreman_server_url }}"
+    repository: "{{ item.name }}"
+    product: "{{ item.product }}"
+    organization: "{{ item.organization }}"
+    validate_certs: false
+  loop: "{{ repos }}"
+  ignore_errors: true
+  tags:
+    - repo_sync

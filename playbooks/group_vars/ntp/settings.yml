@@ -1,0 +1,13 @@
+---
+
+ntp_keys_file: /etc/ntp/keys
+ntp_pool_servers:
+        - time1.google.com
+        - time2.google.com
+        - time3.google.com
+        - time4.google.com
+ntp_iburst_default: false
+ntp_step_tickers_file: /etc/ntp/step-tickers
+ntp_drift_file: /var/lib/chrony/drift
+ntp_leapsectz: "right/UTC"
+ntp_logdir: /var/log/chrony

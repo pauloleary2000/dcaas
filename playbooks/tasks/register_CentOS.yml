@@ -1,0 +1,20 @@
+---
+- name: Register host with foreman server
+  redhat_subscription:
+    state: present
+    auto_attach: yes
+    server_hostname: "{{ foreman_hostname }}"
+    activationkey: "{{ activation_key }}"
+    org_id: "{{ katello_organization }}"
+    server_insecure: disable
+    pool: 8a9490c87d351fa1017d352c86c3000b
+
+- name: Remove all repos files before running update
+  ansible.builtin.file:
+    path: /etc/yum.repos.d/*
+    state: absent
+
+- name: Update the system packages
+  yum:
+    name: '*'
+    state: latest

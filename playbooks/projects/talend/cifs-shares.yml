@@ -1,0 +1,21 @@
+---
+# the integration_mounts_src variable can be overridden from the commandline with
+# extra vars; extra vars ALWAYS win the precedence battle.
+# eg: ansible-playbook -i <inventory> -e "integration_mounts_src=//some/other/mount/point" playbook.yml
+integration_mounts_src: '//mt2asvm9/k8s_int_tld_qa/IntegrationPlatform'
+
+# the mounts below are going to default to dirmode 0777 and file_mode 0766 in the code. Only add those 
+# fields below if you want to alter the default
+integration_mounts:
+                - name: Binaries
+                - name: ExtractData
+                - name: IntermediateData
+                - name: MetaData
+                - name: Outbound
+                  dir_mode: '0755'
+                  file_mode: '0744'
+                - name: PersistedData
+                - name: RecoveryData
+                  dir_mode: '0755'
+                  file_mode: '0744'
+                - name: TransformedData

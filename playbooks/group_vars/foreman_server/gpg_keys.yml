@@ -1,0 +1,11 @@
+---
+
+gpg_keys:
+  - name: RPM-GPG-KEY-CentOS
+    key: CentOS-GPG-KEY
+    organization: OLEARYS-HOMELAB
+    content_type: gpg_key
+  - name: RPM-GPG-KEY-Puppet
+    key: Puppet-GPG-KEY
+    organization: OLEARYS-HOMELAB
+    content_type: gpg_key

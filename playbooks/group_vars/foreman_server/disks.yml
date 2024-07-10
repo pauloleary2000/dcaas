@@ -1,0 +1,17 @@
+---
+
+disks:
+        - name: sdb
+          volume_group: vg01
+          logical_volume: mongodb
+          fstype: ext4
+          mount_path: /var/lib/mongodb
+          size: 100%FREE
+        
+        - name: sdc
+          volume_group: vg02
+          logical_volume: pulp
+          fstype: ext4
+          mount_path: /var/lib/pulp
+          size: 100%FREE
+

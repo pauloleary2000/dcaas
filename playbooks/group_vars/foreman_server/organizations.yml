@@ -1,0 +1,17 @@
+---
+
+orgs:
+  - name: olearys-devops
+    parent: OLEARYS-HOMELAB
+    description: "Basic devops organization for olearys.ca homelab"
+    users: all
+    smart_proxies: all
+    subnets: all
+    compute_resources: all
+    media: all
+    prov_templates: all
+    part_tables: all
+    domains: all
+    realms: all
+    host_groups: all
+    locations: all

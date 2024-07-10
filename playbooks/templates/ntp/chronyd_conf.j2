@@ -1,0 +1,11 @@
+{% for p in ntp_pool_servers %}
+pool {{ p }} iburst
+{% endfor %}
+
+driftfile {{ ntp_drift_file }}
+makestep 1.0 3
+rtcsync
+keyfile {{ ntp_keys_file }}
+leapsectz {{ ntp_leapsectz }}
+logdir {{ ntp_logdir }}
+

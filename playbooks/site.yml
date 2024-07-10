@@ -1,0 +1,8 @@
+---
+- import_playbook: create-vm.yml
+
+- import_playbook: deploy_bind.yml
+
+- import_playbook: deploy_foreman_server.yml
+
+

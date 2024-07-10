@@ -1,0 +1,10 @@
+---
+
+services:
+        - name: kafka.service
+          state: started
+          enabled: true
+
+        - name: zookeeper.service
+          state: started
+          enabled: true

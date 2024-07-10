@@ -1,0 +1,21 @@
+---
+
+- name: Create Lab VM in VC
+  hosts: olearys
+  gather_facts: no
+  vars_files:
+    - /home/poleary/olearys-ansible/playbooks/vault-secrets.yml
+  tasks:
+          - name: Delete ALL VMs
+            connection: local
+            vmware_guest:
+                    hostname: "{{ vmware_vcenter_server }}"
+                    username: "{{ vmware_vcenter_admin }}"
+                    password: "{{ vmware_vcenter_admin_passwd }}"
+                    validate_certs: "{{ vmware_vcenter_validate_certs }}"
+                    name: "{{ hostname }}"
+                    template: RHEL84-Patched
+                    datacenter: OLEARYS
+                    folder: HOMELAB
+                    state: absent
+                    force: true

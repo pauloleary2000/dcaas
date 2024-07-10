@@ -1,0 +1,21 @@
+
+redis_bind_interface: "{{ ansible_hostname }}"
+redis_apendonly: false
+redis_save: ""
+redis_sentinel_master_name: "olearysmaster"
+redis_sentinel_redis_host: "{{ ansible_hostname }}"
+redis_port: 6379
+redis_sentinel_redis_quoreum: 2
+redis_sentinel_redis_failover_timeout: 30000
+redis_sentinel_bind:  "{{ ansible_hostname }}"
+
+redis_sysctl:
+        - name: net.core.somaxconn
+          value: 65535
+        - name: vm.overcommit_memory
+          value: 1
+
+redis_tuned_profile: no-thp
+redis_tuned_config_path: /etc/tuned/no-thp
+redis_tuned_config_file: "{{ redis_tuned_config_path }}/tuned.conf"
+

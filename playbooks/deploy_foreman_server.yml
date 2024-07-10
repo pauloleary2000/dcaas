@@ -1,0 +1,243 @@
+---
+- name: Deploy the Foreman Server
+  hosts: foreman_server
+  vars_files:
+    - /home/poleary/olearys-ansible/playbooks/vault-secrets.yml
+  tasks:
+
+
+        - name: Add additional hard drives to base image
+          vmware_guest_disk:
+                hostname: "{{ vmware_vcenter_server }}"
+                username: "{{ vmware_vcenter_admin }}"
+                password: "{{ vmware_vcenter_admin_passwd }}"
+                validate_certs: "{{ vmware_vcenter_validate_certs }}"
+                datacenter: "{{ vmware_default_datacenter }}"
+                name: "{{ hostname }}"
+                disk:
+                        - size_gb: 30
+                          type: thin
+                          autoselect_datastore: true
+                          state: present
+                          scsi_controller: 0
+                          scsi_type: 'paravirtual'
+                          unit_number: 2
+                          disk_mode: 'persistent'
+                        - size_gb: 50
+                          type: thin
+                          autoselect_datastore: true
+                          state: present
+                          scsi_controller: 0
+                          scsi_type: 'paravirtual'
+                          unit_number: 3
+                          disk_mode: 'persistent'
+          delegate_to: localhost
+
+        - name: Rescan entire SCSI bus
+          command: "/bin/echo '- - -' > /sys/class/scsi_host/host0/scan"
+          changed_when: false
+
+        - name: Wait for the disk scan to activate drives
+          shell: "/usr/sbin/fdisk -l | grep {{ disks[1]['name'] }}"
+          register: disk_check
+          until: disk_check.stdout.find('sdc') != -1
+          retries: 20
+          delay: 10
+          changed_when: false
+
+        - name: Regather ansible facts used below
+          setup:
+
+        - name: Set exec perms on /tmp
+          ignore_errors: true
+          mount:
+                path: /tmp
+                opts: exec
+                state: remounted
+          when: "'tmp' in ansible_facts['mounts']|json_query('[].mount')"
+
+        - name: Create the required file structure for foreman
+          file:
+                path: "{{ item }}"
+                state: directory
+          loop:
+                - /var/lib/pulp
+                - /var/lib/mongodb
+
+        - name: Create the LVM structure for foreman databases
+          block:
+                - name: Create the partition
+                  parted:
+                        device: /dev/{{ item.name }}
+                        state: present
+                        number: 1
+                        flags: [ lvm ]
+                  loop: "{{ disks }}"
+
+                - name: Create the Volume Group
+                  lvg:
+                        vg: "{{ item.volume_group }}"
+                        pvs: /dev/{{ item.name }}1
+                  loop: "{{ disks }}"
+
+                - name: Create the logical volume
+                  lvol:
+                        vg: "{{ item.volume_group }}"
+                        lv:  "{{ item.logical_volume }}"
+                        size: "{{ item.size }}"
+                  loop: "{{ disks }}"
+
+                - name: Create the filesystem
+                  filesystem:
+                        fstype: "{{ item.fstype }}"
+                        dev: /dev/{{ item.volume_group }}/{{ item.logical_volume }}
+                  loop: "{{ disks }}"
+
+                - name: Mount the logical volume
+                  mount:
+                        src: /dev/{{ item.volume_group }}/{{ item.logical_volume }}
+                        path: "{{ item.mount_path }}"
+                        state: mounted
+                        fstype: "{{ item.fstype }}"
+                  loop: "{{ disks }}"
+          when:   
+                - disks[0]['name'] in ansible_facts['devices']
+                - disks[1]['name'] in ansible_facts['devices']
+          rescue:
+                - name: Report error with disk space layout
+                  debug:
+                    msg: "There was an error allocation the LVM disk drives"
+
+        - name: Disk space allocated, continuing foreman install
+          debug:
+            msg: "Disk space allocated, continuing foreman install"
+
+        - name: Run the foreman installer
+          block:
+#                - name: Update the system packages
+#                  yum:
+#                        name: '*'
+#                        state: latest
+
+                - name: Install the gpg keys
+                  rpm_key:
+                        key: "{{ item }}"
+                        state: present
+                  loop:
+                    - "{{ foreman_gpg_key }}"
+                    - "{{ foreman_puppet_gpg_key }}"
+
+                - name: Enable the foreman repository {{ foreman_repo_rpm }}
+                  yum:
+                        name: "{{ foreman_repo_rpm }}"
+                        state: latest
+                        disable_gpg_check: true
+
+                - name: Install the Katello repo
+                  yum:
+                        name: "{{ foreman_katello_repo_rpm }}"
+                        state: latest
+                        disable_gpg_check: true
+
+                - name: Install Ansible29 packages
+                  yum:
+                        name: centos-release-ansible-29
+                        state: present
+                  when: ansible_facts['distribution'] == 'CentOS'
+
+                - name: Install the puppet repo
+                  yum:
+                        name: "{{ foreman_puppet_repo_rpm }}"
+                        state: present
+
+                - name: Reset Ruby module
+                  command: "dnf -y module reset ruby"
+
+                - name: Enable {{ foreman_ruby_module }} module
+                  command: "dnf -y module enable {{ foreman_ruby_module }}"
+
+                - name: Enable powertools repo
+                  command: 'dnf config-manager --set-enabled powertools'
+                  when: ansible_facts['distribution'] == 'CentOS'
+
+                - name: Download and install the foreman installer
+                  yum:
+                        name: foreman-installer-katello
+                        state: latest
+
+#                - name: Deploy the foreman-installer answer file
+#                  template:
+#                    dest: "{{ foreman_answer_file }}"
+#                    src: templates/foreman-server/etc/foreman-installer/scenarios.d/foreman-answers.yaml.j2
+
+                - name: Check for existing installation running
+                  service_facts:
+                  tags:
+                    - run_installer
+
+                - name: Run the foreman installer (with options)
+                  command: "{{ foreman_install_cmd }} {% for arg in foreman_install_options %} {{ arg }} {% endfor %}"
+                  register: foreman_installer_cmd_output
+                  when: ansible_facts['services']['foreman.service'] is not defined
+                  tags:
+                    - run_installer
+
+        - name: Enable and configure the local firewall
+          block:
+                - name: Install {{ firewall_pkg }}
+                  yum:
+                        name: "{{ firewall_pkg }}"
+                        state: latest
+
+                - name: Start and Enable {{ firewall_service }}
+                  service:
+                        name: "{{ firewall_service }}"
+                        state: started
+                        enabled: true
+
+                - name: Configure {{ firewall_service }} ports
+                  firewalld:
+                        port: "{{ item.port }}"
+                        permanent: true
+                        state: enabled
+                        immediate: true
+                  loop: "{{ firewall_ports }}"
+                  notify: restart firewalld
+
+
+
+        - name: Start post install configuration of foreman
+          import_tasks: tasks/foreman_organization.yml
+          tags:
+            - post_config
+
+        - name: Create custom Products
+          import_tasks: tasks/foreman_products.yml
+          tags:
+            - post_config
+
+        - name: Create GPG Keys
+          import_tasks: tasks/foreman_gpg_keys.yml
+          tags:
+            - post_config
+
+        - name: Create Repositories
+          import_tasks: tasks/foreman_repositories.yml
+          tags:
+            - post_config
+
+        - name: Create activation keys
+          import_tasks: tasks/foreman_activation_keys.yml
+          tags:
+            - post_config
+
+  handlers:
+        - name: restart firewalld
+          service:
+                name: "{{ firewall_service }}"
+                state: restart
+
+
+
+
+               

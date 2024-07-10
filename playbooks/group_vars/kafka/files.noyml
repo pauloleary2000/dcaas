@@ -1,0 +1,23 @@
+---
+
+files:
+        - name: /var/lib/kafka
+          state: directory
+          
+        - name: /opt/prometheus
+          type: directory
+
+        - name: /var/lib/kafka/lost+found
+          state: absent
+
+copy_files:
+        - name: /opt/prometheus/kafka.yml
+          src: files/kafka/prometheus/jmx_kafka.yml
+          state: present
+
+        - name: /opt/prometheus/zookeeper.yml
+          src: files/kafka/prometheus/jmx_zookeeper.yml
+          state: present
+
+        - name: /etc/sysconfig/kafka
+          

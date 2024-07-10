@@ -1,0 +1,9 @@
+---
+
+packages:
+        - curl
+        - policycoreutils
+        - openssh-server
+        - openssh-clients
+        - postfix
+        - firewalld

@@ -1,0 +1,20 @@
+---
+
+disks:
+        - name: sdb
+          volume_group: vg01
+          logical_volume: mongodb
+          fstype: ext4
+          mount_path: /var/lib/mongodb
+          size: 29g
+        
+        - name: sdc
+          volume_group: vg02
+          logical_volume: pulp
+          fstype: ext4
+          mount_path: /var/lib/pulp
+          size: 49g
+
+vm_memory_mb: 8192
+vm_vcpus: 2
+vmware_linux_template: "{{ os }}-Patched"

@@ -1,0 +1,14 @@
+---
+
+repos:
+  - name: confluent-kafka.DIST
+    baseurl: https://packages.confluent.io/rpm/6.2/$releasever
+    enabled: true
+    gpgcheck: true
+    gpg_key: https://packages.confluent.io/rpm/6.2/archive.key 
+  
+  - name: confluent-kafka
+    baseurl: https://packages.confluent.io/rpm/6.2
+    enabled: true
+    gpgcheck: true
+    gpg_key: https://packages.confluent.io/rpm/6.2/archive.key 

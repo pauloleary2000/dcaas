@@ -1,0 +1,62 @@
+---
+- name: Deploy the Foreman Squid Proxy server
+  hosts: foreman_proxies
+
+  tasks:
+        
+        - name: Set exec perms on /tmp
+          ignore_errors: true
+          mount:
+                path: /tmp
+                opts: exec
+                state: remounted
+
+        - name: Create the required file structure for foreman
+          file:
+                path: "{{ item }}"
+                state: directory
+          loop:
+                - /var/lib/pulp
+                - /var/lib/mongodb
+
+        - name: Create the LVM structure for foreman databases
+          block:
+                - name: Create the partition on /dev/{{ item.name }}
+                  parted:
+                        device: /dev/{{ item.name }}
+                        state: present
+                        number: 1
+                        flags: [ lvm ]
+                  loop: "{{ disks }}"
+
+                - name: Create the Volume Group {{ item.volume_group }}
+                  lvg:
+                        vg: "{{ item.volume_group }}"
+                        pvs: /dev/{{ item.name }}1
+                  loop: "{{ disks }}"
+
+                - name: Create the logical volume for {{ item.logical_volume }}
+                  lvol:
+                        vg: "{{ item.volume_group }}"
+                        lv:  "{{ item.logical_volume }}"
+                        #size: "{{ item.size }}"
+                  loop: "{{ disks }}"
+
+                - name: Create the filesystem on {{ item.logical_volume }} logical volume
+                  filesystem:
+                        fstype: "{{ item.fstype }}"
+                        dev: /dev/{{ item.volume_group }}/{{ item.logical_volume }}
+                  loop: "{{ disks }}"
+
+                - name: Mount the {{ item.logical_volume }} logical volume
+                  mount:
+                        src: /dev/{{ item.volume_group }}/{{ item.logical_volume }}
+                        path: "{{ item.mount_path }}"
+                        state: mounted
+                        fstype: "{{ item.fstype }}"
+                  loop: "{{ disks }}"
+          when:   
+                - disks[0]['name'] in ansible_facts['devices']
+                - disks[1]['name'] in ansible_facts['devices']
+
+               

@@ -1,0 +1,16 @@
+---
+
+# settings for the BIND named service and config files
+
+listen_on_port: any
+working_directory: /var/named
+allow_query: any
+dns_recursion: no
+dnssec_enable: no
+dnssec_validation: no
+managed_keys_directory: "{{ working_directory}}/dynamic"
+
+# variables used in the bind role
+bind_allow_query: ['any']
+bind_listen_ipv4: ['any']
+bind_recursion: true

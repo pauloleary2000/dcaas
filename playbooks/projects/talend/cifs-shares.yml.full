@@ -1,0 +1,27 @@
+---
+integration_mounts_src: '//mt2asvm9/k8s_int_tld_qa/IntegrationPlatform'
+integration_mounts:
+                - name: Binaries
+                  dir_mode: '0777'
+                  file_mode: '0766'
+                - name: ExtractData
+                  dir_mode: '0777'
+                  file_mode: '0766'
+                - name: IntermediateData
+                  dir_mode: '0777'
+                  file_mode: '0766'
+                - name: MetaData
+                  dir_mode: '0777'
+                  file_mode: '0766'
+                - name: Outbound
+                  dir_mode: '0755'
+                  file_mode: '0744'
+                - name: PersistedData
+                  dir_mode: '0777'
+                  file_mode: '0766'
+                - name: RecoveryData
+                  dir_mode: '0755'
+                  file_mode: '0744'
+                - name: TransformedData
+                  dir_mode: '0777'
+                  file_mode: '0766'

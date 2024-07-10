@@ -1,0 +1,59 @@
+---
+
+bind_zones:
+  # Example of a primary zone (hosts: and name_servers: ares defined)
+  - name: olearys.ca           # Domain name
+    create_reverse_zones: false  # Skip creation of reverse zones
+    primaries:
+      - 192.168.1.60                # Primary server(s) for this zone
+    name_servers:
+      - ns1.olearys.ca.
+      - ns1.olearys.ca.
+    hosts:
+#      - { ip: 192.168.1.62, name: ntp1.olearys.ca }
+#      - { ip: 192.168.1.63, name: ntp2.olearys.ca }
+#      - { ip: 192.168.1.60, name: dns1.olearys.ca, aliases: ['ns1'] }
+#      - { ip: 192.168.1.61, name: dns2.olearys.ca, aliases: ['ns2'] }
+#      - { ip: 192.168.1.64, name: foreman.olearys.ca }
+#      - { ip: 192.168.1.65, name: tower1.olearys.ca }
+    hosts:
+      - name: ns1
+        ip: 192.168.1.60
+        aliases:
+          - dns1
+      - name: ns2
+        ip: 192.168.1.61
+        aliases:
+          - dns2
+      - name: '@'                # Enables "http://mydomain.com/"
+        ip:
+          - 192.168.1.65            # Multiple IP addresses for a single host
+          - 192.168.1.65           #   results in DNS round robin
+        aliases:
+          - www
+      - name: ntp1
+        ip: 192.168.1.62
+        aliases:
+          - time1
+      - name: ntp2
+        ip: 192.168.1.63
+        aliases:
+          - time2
+      - name: git
+        ip: 192.168.1.96
+        aliases:
+          - gitlab
+      - name: foreman
+        ip: 192.168.1.64
+        aliases:
+          - satellite
+          - puppet
+    networks:
+      - '192.168.1'
+      - '10'
+      - '172.16'
+    services:
+      - name: _ldap._tcp
+        weight: 100
+        port: 88
+        target: dc001

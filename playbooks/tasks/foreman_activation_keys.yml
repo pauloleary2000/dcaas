@@ -1,0 +1,16 @@
+---
+
+# create the activation keys for the foreman server
+
+- name: Ensure Activation keys are present and available
+  theforeman.foreman.activation_key:
+    username: "{{ foreman_admin_username }}"
+    password: "{{ foreman_admin_password }}"
+    server_url: "{{ foreman_server_url }}"
+    name: "{{ item.name }}"
+    organization: "{{ item.organization }}"
+    lifecycle_environment: "{{ item.lifecycle_env }}"
+    validate_certs: false
+    subscriptions:
+      - name: "{{ item.subscriptions }}"
+  loop: "{{ activationkeys }}"

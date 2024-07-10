@@ -1,0 +1,18 @@
+---
+
+haproxy_timeout_connect: 4s
+haproxy_timeout_server: 30s
+haproxy_mode: tcp
+haproxy_timeout_client: 30s
+haproxy_frontend_name: redis_proxy
+haproxy_frontend_bind_addr: "{{ hostvars['haproxy1'].ansible_host }}"
+haproxy_frontend_bind_port: 6379
+haproxy_backend_name: redis_cluster
+haproxy_backend_options: tcp-check
+haproxy_backend_port: 6379
+haproxy_maxconn: 1024
+haproxy_check_interval: 1s
+haproxy_master: "{{ hostvars['redis1'].ansible_host }}"
+haproxy_slave1: "{{ hostvars['redis2'].ansible_host }}"
+haproxy_slave2: "{{ hostvars['redis3'].ansible_host }}"
+

@@ -1,0 +1,7 @@
+---
+
+products:
+  - name: Centos8
+    organization: OLEARYS-HOMELAB
+  - name: Centos7
+    organization: OLEARYS-HOMELAB

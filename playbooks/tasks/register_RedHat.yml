@@ -1,0 +1,17 @@
+---
+
+#- name: Redgister with the RHSM service
+#  hosts: all
+#  gather_facts: false
+#  vars_files:
+#    - /home/poleary/olearys-ansible/playbooks/vault-secrets.yml
+
+#  tasks:
+
+    - name: Register host with Redhat
+      redhat_subscription:
+        state: present
+        username: "{{ redhat_subscription_username }}"
+        password: "{{ redhat_subscription_password }}"
+        auto_attach: true
+        force_register: true

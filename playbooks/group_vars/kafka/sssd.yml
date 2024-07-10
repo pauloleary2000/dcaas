@@ -1,0 +1,13 @@
+---
+
+sssd_allow_groups:
+        - dl_servers_linux_all_admin
+        - dl_servers_linux_all_user
+        - g_machinelearning
+        - g_appadmin
+        - g_integration_technology
+
+sssd_allow_users:
+        - ansible
+        - root
+        - poleary

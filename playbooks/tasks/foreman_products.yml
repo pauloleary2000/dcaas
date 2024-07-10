@@ -1,0 +1,13 @@
+---
+
+# create the custom products for the foreman server
+
+- name: Ensure custom products are present and available
+  theforeman.foreman.product:
+    username: "{{ foreman_admin_username }}"
+    password: "{{ foreman_admin_password }}"
+    server_url: "{{ foreman_server_url }}"
+    name: "{{ item.name }}"
+    organization: "{{ item.organization }}"
+    validate_certs: false
+  loop: "{{ products }}"

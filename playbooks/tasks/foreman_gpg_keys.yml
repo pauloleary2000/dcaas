@@ -1,0 +1,15 @@
+---
+
+# create the gpgkeys keys for the foreman server
+
+- name: Ensure Activation keys are present and available
+  theforeman.foreman.content_credential:
+    username: "{{ foreman_admin_username }}"
+    password: "{{ foreman_admin_password }}"
+    server_url: "{{ foreman_server_url }}"
+    name: "{{ item.name }}"
+    organization: "{{ item.organization }}"
+    content_type: "{{ item.content_type }}"
+    content: "{{ lookup('file', 'files/foreman_server/gpg_keys/{{ item.key }}') }}"
+    validate_certs: false
+  loop: "{{ gpg_keys }}"

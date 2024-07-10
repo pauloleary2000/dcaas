@@ -1,0 +1,19 @@
+---
+
+foreman_puppet_repo_rpm: https://yum.puppet.com/puppet6-release-el-8.noarch.rpm
+foreman_puppet_gpg_key: https://yum.puppetlabs.com/RPM-GPG-KEY-puppet-20250406
+foreman_repo_rpm: https://yum.theforeman.org/releases/nightly/el8/x86_64/foreman-release.rpm
+foreman_gpg_key: https://yum.theforeman.org/RPM-GPG-KEY-foreman
+foreman_katello_repo_rpm: https://yum.theforeman.org/katello/nightly/katello/el8/x86_64/katello-repos-latest.rpm
+
+foreman_install_cmd: foreman-installer
+foreman_install_options:
+  - ' --scenario katello'
+  - ' --foreman-initial-organization "OLEARYS-HOMELAB"'
+  - ' --foreman-initial-admin-password {{ foreman_admin_password }}'
+  - ' --foreman-initial-admin-username {{ foreman_admin_username }}'
+
+foreman_ruby_module: "ruby:2.7"
+foreman_answer_file: /etc/foreman-installer/scenarios.d/foreman-answers.yaml
+
+foreman_server_url: "https://{{ ansible_host }}"

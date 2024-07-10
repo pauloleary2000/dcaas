@@ -1,0 +1,22 @@
+---
+
+- name: Deploy a basic Kafka 3 nodes cluster
+  hosts: kafka
+
+  tasks:
+
+        - name: Test template for /etc/kafka/server.properties
+          template:
+                src: templates/kafka/etc/kafka/server.properties.j2
+                dest: /tmp/server.properties
+        - name: Test template for /etc/kafka/zookeeper.properties
+          template:
+                src: templates/kafka/etc/kafka/zookeeper.properties.j2
+                dest: /tmp/zookeeper.properties
+        - name: Create sudoers file for allowed users
+          template:
+                src: templates/kafka/etc/sudoers.d/10_allowed_groups_nopasswd.j2
+                dest: /etc/sudoers.d/10_allowed_groups_nopasswd
+                owner: root
+                group: root
+                mode: 0600

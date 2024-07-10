@@ -1,0 +1,14 @@
+---
+
+activationkeys:
+  - name: olearys-centos-8
+    organization: OLEARYS-HOMELAB
+    lifecycle_env: Library
+    autoattach: true
+    subscriptions: Centos8
+
+  - name: olearys-centos-7
+    organization: OLEARYS-HOMELAB
+    lifecycle_env: Library
+    autoattach: false
+    subscriptions: Centos7

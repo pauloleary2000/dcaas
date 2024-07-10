@@ -1,0 +1,77 @@
+---
+
+- name: Deploy redis servers
+  hosts: redis
+  vars:
+        site: olearys
+
+  tasks:
+
+        - name: Check the active tuned profile
+          command: "/sbin/tuned-adm active"
+          register: tuned-active
+
+        - name: Configure tuned for {{ redis_service }}
+          block:
+
+                - name: Ensure tuned profile is set to {{ redis_tuned_profile }}
+                  command: "/sbin/tuned-adm profile {{ redis_tuned_profile }}"
+        
+                - name: Ensure the tuned directory exists
+                  file:
+                        path: "{{ redis_tuned_config_path }}"
+                        state: directory
+                        owner: root
+                        group: root
+                        mode: 0755
+
+                - name: Create the tuned config file
+                  copy:
+                        src: "files/redis/{{ redis_tuned_config_file }}"
+                        dest: "{{ redis_tuned_config_file }}"
+                        owner: root
+                        group: root
+                        mode: 0644
+          when: {{ redis_tuned_profile }} not in tuned-active.stout
+
+        - name: Make sure the EPEL repo is installed
+          command: "yum -y install {{ global_epel_repo }}"
+
+        - name: Install the required Packages for {{ redis_service }}
+          yum:
+                name: "{{ redis_packages }}"
+                state: latest
+
+        - name: Configure kernel parameters from {{ redis_service }}
+          sysctl:
+                name: {{ itemi.name }}
+                value: {{ item.value }}
+                sysctl_set: yes
+                state: present
+                reload: true
+          loop: "{{ redis_sysctl }}"
+        
+        - name: Configure the {{ redis_service }} service
+          template:
+                dest: "{{ redis_config_file }}"
+                src: templates/redis/{{ redis_service }}_conf.j2
+                owner: root
+                group: root
+                mode: 0644
+          notify: restart redis
+        
+        - name: Start and Enable the {{ redis_service }} service
+          service:
+                name: "{{ redis_service }}"
+                enabled: true
+                state: started
+
+
+  handlers:
+
+        - name: restart redis
+          service:
+                name: "{{ redis_service }}"
+                state: restarted
+
+                        

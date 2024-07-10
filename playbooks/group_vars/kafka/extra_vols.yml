@@ -1,0 +1,9 @@
+---
+
+extra_vols:
+        - name: /var/lib/kafka
+          fstype: xfs
+          size: 2
+          state: present
+          mounted: true
+

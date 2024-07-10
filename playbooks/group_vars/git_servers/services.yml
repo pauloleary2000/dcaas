@@ -1,0 +1,9 @@
+---
+
+services:
+        - name: sshd
+          enabled: true
+        - name: firewalld
+          enabled: true
+        - name: postfix
+          enabled: true

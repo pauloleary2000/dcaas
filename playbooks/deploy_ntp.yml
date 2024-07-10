@@ -1,0 +1,39 @@
+---
+
+- name: Deploy NTP servers
+  hosts: ntp
+  vars:
+        site: olearys
+
+  tasks:
+
+        - name: Install the required Packages for {{ ntp_service }}
+          yum:
+                name: "{{ ntp_packages }}"
+                state: latest
+
+        - name: Configure the {{ ntp_service }} service
+          template:
+                dest: "{{ ntp_config_file }}"
+                src: templates/ntp/{{ ntp_service }}_conf.j2
+                owner: root
+                group: root
+                mode: 0644
+          notify: restart ntp
+        
+        - name: Start and Enable the {{ ntp_service }} service
+          service:
+                name: "{{ ntp_service }}"
+                enabled: true
+                state: started
+
+
+
+  handlers:
+
+        - name: restart ntp
+          service:
+                name: "{{ ntp_service }}"
+                state: restarted
+
+                        

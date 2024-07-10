@@ -1,0 +1,8 @@
+---
+
+- name: test the prm node file adder
+  hosts: localhost
+
+  tasks:
+    - name: import the adder test task
+      import_tasks: tasks/add_server_to_prometheus.yml

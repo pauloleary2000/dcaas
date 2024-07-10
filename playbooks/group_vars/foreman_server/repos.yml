@@ -1,0 +1,63 @@
+---
+
+repos:
+  - name: CentOS-Base
+    content_type: yum
+    product: Centos8
+    organization: OLEARYS-HOMELAB
+    url: http://mirror.its.dal.ca/centos/8/BaseOS/x86_64/os/
+    mirror_on_sync: false
+    gpg_key: RPM-GPG-KEY-CentOS
+    download_policy: immediate
+    auto_enabled: true
+    checksum_type: sha256
+    unprotected: true
+    verify_ssl_on_sync: false
+  - name: CentOS-AppStream
+    content_type: yum
+    product: Centos8
+    organization: OLEARYS-HOMELAB
+    url: http://mirror.its.dal.ca/centos/8/AppStream/x86_64/os/
+    mirror_on_sync: false
+    gpg_key: RPM-GPG-KEY-CentOS
+    download_policy: immediate
+    auto_enabled: true
+    checksum_type: sha256
+    unprotected: true
+    verify_ssl_on_sync: false
+  - name: CentOS-PowerTools
+    content_type: yum
+    product: Centos8
+    organization: OLEARYS-HOMELAB
+    url: http://mirror.its.dal.ca/centos/8/PowerTools/x86_64/os/
+    mirror_on_sync: false
+    gpg_key: RPM-GPG-KEY-CentOS
+    download_policy: immediate
+    auto_enabled: true
+    checksum_type: sha256
+    unprotected: true
+    verify_ssl_on_sync: false
+  - name: CentOS-Devel
+    content_type: yum
+    product: Centos8
+    organization: OLEARYS-HOMELAB
+    url: http://mirror.its.dal.ca/centos/8/Devel/x86_64/os/
+    mirror_on_sync: false
+    gpg_key: RPM-GPG-KEY-CentOS
+    download_policy: immediate
+    auto_enabled: true
+    checksum_type: sha256
+    unprotected: true
+    verify_ssl_on_sync: false
+  - name: CentOS-HighAvailability
+    content_type: yum
+    product: Centos8
+    organization: OLEARYS-HOMELAB
+    url: http://mirror.its.dal.ca/centos/8/HighAvailability/x86_64/os/
+    mirror_on_sync: false
+    gpg_key: RPM-GPG-KEY-CentOS
+    download_policy: immediate
+    auto_enabled: true
+    checksum_type: sha256
+    unprotected: true
+    verify_ssl_on_sync: false

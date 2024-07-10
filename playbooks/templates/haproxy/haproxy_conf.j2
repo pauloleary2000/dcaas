@@ -1,0 +1,28 @@
+defaults REDIS
+ mode {{ haproxy_mode }}
+ timeout connect  {{ haproxy_timeout_connect }}
+ timeout server   {{ haproxy_timeout_server }}
+ timeout client  {{ haproxy_timeout_client }}
+frontend {{ haproxy_frontend_name }}
+ bind {{ haproxy_frontend_bind_addr }}:{{haproxy_frontend_bind_port }} name redis
+ default_backend {{ haproxy_backend_name }}
+backend {{ haproxy_backend_name }}
+ option {{ haproxy_backend_options }}
+ tcp-check connect port {{ haproxy_backend_port }}
+ tcp-check send PING\r\n
+ tcp-check expect string +PONG
+ tcp-check send info\ replication\r\n
+ tcp-check expect string role:master
+ tcp-check send QUIT\r\n
+ tcp-check expect string +OK
+
+server master {{ haproxy_master }}:{{ haproxy_backend_port }}  maxconn {{ haproxy_maxconn }}  check inter {{ haproxy_check_interval }}
+ server slave1 {{ haproxy_slave1 }}:{{ haproxy_backend_port }}  maxconn {{ haproxy_maxconn }}  check inter {{ haproxy_check_interval }}
+ server slave2 {{ haproxy_slave2 }}:{{ haproxy_backend_port }}  maxconn {{ haproxy_maxconn }}  check inter {{ haproxy_check_interval }}
+frontend stats
+ mode http
+ bind *:8404
+ stats enable
+ stats uri /stats
+ stats refresh 10s
+ stats admin if LOCALHOST

@@ -1,0 +1,52 @@
+---
+
+- name: Deploy a git server
+  hosts: git
+
+  tasks:
+
+        - name: Make sure the EPEL repo is installed
+          command: "yum -y install {{ global_epel_repo }}"
+
+        - name: Install the dependencies as listed on gitlab.com
+          yum:
+                name: "{{ packages }}"
+                state: latest
+        
+        - name: Start and Enable services
+          service:
+                name:  "{{ item.name }}"
+                enabled: "{{ item.enabled }}"
+                state: started
+          loop: "{{ services }}"
+
+        - name: open the firewall ports for http(s)
+          firewalld:
+                service: "{{ item }}"
+                permanent: true
+                immediate: true
+                state: enabled
+          loop:
+                - http
+                - https
+
+        - name: Enable the git repo in yum.repos.d
+          copy:
+                src: files/git/etc/yum.repos.d/git.repo
+                dest: /etc/yum.repos.d/git.repo
+
+        - name: Run the gitlab installer with yum custom command
+          shell: "EXTERNAL_URL='http://{{ ansible_host }}' yum -y install gitlab-ce"
+          register: gitlab_result
+
+        - name: Output the original root password,as it expires in 24h
+          fetch:
+                src: /etc/gitlab/initial_root_password
+                dest: files/git/{{ hostname }}/
+          tags:
+                - fetch
+
+
+
+
+        

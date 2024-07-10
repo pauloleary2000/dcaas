@@ -1,0 +1,77 @@
+---
+
+- name: Setup the CIFS shares for Integration Platform on Talend 
+  gather_facts: false
+  hosts: all
+  vars_files:
+          - cifs-secrets.yaml
+          - cifs-shares.yml
+
+  tasks:
+          - name: Environment
+            debug:
+                    msg: "Creating CIFS mount for {{ integration_env }}"
+
+          - name: Install the required CIFS packages
+            yum:
+                    name: cifs-utils
+                    state: present
+
+          - name: Create the file stub directory
+            file:
+                    path: "{{ item }}"
+                    mode: '0775'
+                    state: directory
+            loop:
+                    - /tmp/IntegrationPlatform
+                    - /IntegrationPlatform
+
+          - name: Create the credentials file
+            copy:
+                    content: |
+                            username={{ cifs_user }}
+                            password={{ cifs_user_pass }}
+                    dest: "{{ cifs_credentials_file }}"
+                    mode: 0600
+
+          - name: Mount the initial CIFS share
+            mount:
+                    state:  mounted
+                    fstype: cifs
+                    path: /tmp/IntegrationPlatform
+                    src: "{{ integration_mounts_src }}"
+                    opts: "credentials={{ cifs_credentials_file }},file_mode=0755,dir_mode=0775"
+
+          - name: Create the folder structure in IntegrationPlatform
+            unarchive:
+                    src: files/cifs/IntegrationPlatform{{ integration_env }}.tar
+                    dest: /tmp/IntegrationPlatform
+
+          - name: Unmount the CIFS share so we can mount subfolders
+            mount:
+                    state: absent
+                    path: /tmp/IntegrationPlatform
+                    src: "{{ integration_mounts_src }}"
+
+          - name: Create the local sub folder structure for the CIFS mounts
+            unarchive:
+                    src: files/cifs/IntegrationPlatform{{ integration_env }}.tar
+                    dest: /IntegrationPlatform
+
+          - name: Mount the CIFS subfolders for each of the data directories
+            mount:
+                    state: mounted
+                    fstype: cifs
+                    path: "/IntegrationPlatform/{{ item.1 }}/{{ item.0.name }}"
+                    src: "{{ integration_mounts_src }}/{{ item.1 }}/{{ item.0.name }}"
+                    opts: "credentials=/root/.cifs-integration-creds,file_mode={{ item.0.file_mode | default('0766') }},dir_mode={{ item.0.dir_mode | default('0777') }}"
+            with_nested: 
+                    - "{{ integration_mounts }}"
+                    - [ 'Dev', 'QA' ]
+
+          
+
+
+                    
+
+

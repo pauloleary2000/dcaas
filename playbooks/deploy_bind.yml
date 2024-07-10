@@ -1,0 +1,35 @@
+---
+
+- name: Deploy DNS BIND service
+  hosts: dns
+
+  roles:
+    - role: "bertvv.bind"
+
+  tasks:
+    - name: Install and Configure the firewall
+      block:
+        - name: Install the {{ default_firewall_pkg }} package
+          yum:
+                name: "{{ default_firewall_pkg }}"
+                state: latest
+
+        - name: Start and enable {{ default_firewall_service }}
+          service:
+                name: "{{ default_firewall_service }}"
+                enabled: true
+                state: started
+
+        - name: Configure the {{ default_firewall_service }} ports
+          firewalld:
+                service: "{{ item.service }}"
+                permanent: true
+                immediate: true
+                state: enabled
+          loop: "{{ firewall_rules }}"
+          notify: restart {{ default_firewall_service }}
+  handlers:
+    - name: restart firewalld
+      service:
+        name: "{{ default_firewall_service }}"
+        state: restarted

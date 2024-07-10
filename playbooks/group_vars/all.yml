@@ -1,0 +1,34 @@
+---
+
+# default linux OS to install
+default_linux_os: 'RedHat8'
+#os: 'CentOS8'
+
+# common  variables to be used by all ansible managed groups
+# Vmware connection varaibles
+
+vmware_vcenter_server: 192.168.1.30
+vmware_vcenter_admin: "administrator@vsphere.local"
+#vmware_vcenter_admin_passwd :: stored in ansible vault file
+
+# default settings for new virtual machines
+
+vmware_default_linux_template : "{{ default_linux_os }}-Patched"
+vmware_default_datacenter: "OLEARYS"
+vmware_vcenter_validate_certs: false
+vmware_default_vm_folder: "HOMELAB"
+
+# subscription registration at Redhat
+# redhat_subscription_username: see vault
+# redhat_subscription_password: see vault
+
+katello_ca_consumer_rpm: https://{{ hostvars['foreman']['ansible_host'] }}/pub/katello-ca-consumer-latest.noarch.rpm
+katello_default_organization: OLEARYS-HOMELAB
+
+default_firewall_pkg: firewalld
+default_firewall_service: firewalld
+
+# DNS settings
+default_primary_dns_server: 192.168.1.60
+default_secondary_dns_server: 192.168.1.61
+default_fallback_dns_server: 192.168.1.1

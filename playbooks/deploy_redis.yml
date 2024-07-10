@@ -1,0 +1,12 @@
+---
+- name: configure the master redis server
+  hosts: redis1
+  roles:
+    - davidwittman.redis
+
+- name: configure redis slaves
+  hosts: redis2,redis3
+  vars:
+    - redis_slaveof: "{{ hostvars['redis1'].ansible_host }} 6379"
+  roles:
+    - davidwittman.redis

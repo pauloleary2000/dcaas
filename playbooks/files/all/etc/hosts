@@ -1,0 +1,10 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+192.168.1.60    dns1.olearys.ca dns1 ns1 ns1.olearys.ca
+192.168.1.61    dns2.olearys.ca dns2
+192.168.1.62    ntp1.olearys.ca ntp1
+192.168.1.63    ntp2.olearys.ca ntp2
+192.168.1.64    foreman.olearys.ca foreman
+192.168.1.65    tower1.olearys.ca tower1
+192.168.1.96    git.olearys.ca git

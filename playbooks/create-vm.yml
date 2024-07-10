@@ -1,0 +1,50 @@
+---
+- name: Create VM in VC
+  gather_facts: no
+  hosts: all
+  vars_files:
+    - vault.yml 
+  tasks:
+    - name: Clone the template
+      connection: local
+      vmware_guest:
+        hostname: "{{ vmware_vcenter_server }}"
+        username: "{{ vmware_vcenter_admin }}"
+        password: "{{ vmware_vcenter_admin_passwd }}"
+        validate_certs: "{{ vmware_vcenter_validate_certs }}"
+        name: "{{ inventory_hostname }}"
+        template: "{{ vmware_template }}"
+        datacenter: "{{ datacenter }}"
+        folder: "{{ datacenter }}/vm"
+        state: poweredon
+        force: true
+        hardware:
+          memory_mb: "{{ vm_memory_mb | default('4096') }}"
+          num_cpus: "{{ vm_vcpus | default ('2') }}"
+        networks:
+        - name: "{{ vm_network_name }}"
+          ip: "{{ ansible_host }}"
+          netmask: "{{ vm_netmask }}"
+          start_connected: true
+          gateway: "{{ vm_gateway }}"
+        wait_for_ip_address: true
+        customization:
+          domain: "{{ domain }}"
+          dns_servers: 
+            - "{{ hostvars['dns1']['ansible_host'] }}"
+            - "{{ hostvars['dns2']['ansible_host'] }}"
+                       
+    - name: Configure Linux based optionsi
+      block:
+        - name: Set the FQDN for "{{ inventory_hostname }}"
+          hostname:
+            name: "{{ inventory_hostname }}"
+            use: systemd
+        - name: Update the DNS servers
+          template:
+            src: templates/dns/etc/resolv.conf.j2
+            dest: /etc/resolv.conf
+      when: os == "RedHat" or os == "CentOS"
+
+    - name: Register with Foreman
+      import_tasks: tasks/register_CentOS.yml
